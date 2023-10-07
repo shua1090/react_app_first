@@ -20,11 +20,19 @@ function MyApp() {
     }, [] );
 
     function removeOneCharacter(index) {
-        const updated = characters.filter((character, i) =>{
-                return i !== index;
-            }
-        );
-        setCharacters(updated);
+        const characterToDelete = characters[index];
+        
+        fetch(`http://localhost:8000/users/${characterToDelete.id}`, {method: "DELETE",})
+            .then((res) => {
+                // Succesful deletion
+                if (res.status === 204){
+                    console.log("Succesfully deleted on backend, now for the frontend");
+                    const updated = characters.filter((character, i) => i !== index);
+                    setCharacters(updated);
+                } else {
+                    console.log("Failed to delete on backend (maybe resource DNE?)");
+                }
+            });
     }
 
     function postUser(person){
