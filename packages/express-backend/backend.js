@@ -122,6 +122,10 @@ app.get('/', (req, res) => {
 // Posting (Creating) User
 app.post('/users', (req, res) => {
     const userToAdd = req.body;
+    // Add ID
+    let rand = Math.round (10000 * Math.random());
+    userToAdd.id = rand;
+
     addUser(userToAdd);
     // Properly send status that user was created
     res.status(201).send();
