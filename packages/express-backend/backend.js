@@ -127,8 +127,9 @@ app.post('/users', (req, res) => {
     userToAdd.id = rand;
 
     addUser(userToAdd);
-    // Properly send status that user was created
-    res.status(201).send();
+    // Properly send status that user was created, along
+    // with user itself (now with id)
+    res.status(201).send(userToAdd);
 })
 
 app.listen(port, ()=>{
