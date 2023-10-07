@@ -34,8 +34,9 @@ const users = {
           job: 'Bartender',
        }
     ]
- };
+};
 
+// Find Users
 const findUserByName = (name) => {
     return users['users_list'].filter( (user) => user['name'] === name);
 };
@@ -43,19 +44,22 @@ const findUserByName = (name) => {
 const findUserById = (id) => 
     users['users_list'].find( (user) => user['id'] === id);
 
-const findUserByIdAndJob = (name, job) => 
+const findUserByIdAndJob = (name, job) => {
     users['users_list'].find ( 
         (user) => {
             if (user['name'] === name && user['job'] == job)
                 return user;
         }
     );
+}
 
+// Add user to our "Database"
 const addUser = (user) => {
     users['users_list'].push(user);
     return user;
 }
 
+// Delete user from our "Database"
 const deleteUserById = (id) => {
     const index = users['users_list'].findIndex( (user, ind) => {
         if (user.id === id){
@@ -69,6 +73,7 @@ const deleteUserById = (id) => {
     }
 }
 
+// Query Users
 app.get('/users', (req, res) => {
     const name = req.query.name;
     const job = req.query.job;
@@ -87,6 +92,7 @@ app.get('/users', (req, res) => {
     }
 });
 
+// Get a user by ID
 app.get('/users/:id', (req, res) => {
     const id = req.params['id'];
     let result = findUserById(id);
@@ -117,7 +123,8 @@ app.get('/', (req, res) => {
 app.post('/users', (req, res) => {
     const userToAdd = req.body;
     addUser(userToAdd);
-    res.send();
+    // Properly send status that user was created
+    res.status(201).send();
 })
 
 app.listen(port, ()=>{

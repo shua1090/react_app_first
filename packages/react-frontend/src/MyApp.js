@@ -40,7 +40,15 @@ function MyApp() {
 
     function updateList(person){
         postUser(person)
-            .then( () => setCharacters([...characters, person]))
+            .then( (res) => {
+                // SetCharacters if we get proper HTTP Response 201
+                // else log it and ignore
+                if (res.status === 201){
+                    setCharacters([...characters, person]);
+                } else {
+                    console.log(`Status code ${res.status} not 201`)
+                }
+            })
             .catch( (error) => console.log(error) );
     }
 
