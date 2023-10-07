@@ -12,8 +12,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "create-react-app": "^1.2.1",
-    "react-scripts": "3.0.1"
+    "react-scripts": "^5.0.1"
   },
   "description": "",
   "devDependencies": {
