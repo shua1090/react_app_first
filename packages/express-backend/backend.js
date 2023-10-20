@@ -1,93 +1,43 @@
 import express from "express";
 import cors from "cors";
 
+import userService from "./model/user-service.js";
+
 const app = express();
 const port = 8000;
 app.use(cors());
 app.use(express.json());
 
-const users = { 
-    users_list : [
-       { 
-          id : 1,
-          name : 'Ken Kubiak',
-          job: 'SE Professor',
-       },
-    ]
-};
-
-// Find Users
-const findUserByName = (name) => {
-    return users['users_list'].filter( (user) => user['name'] === name);
-};
-
-const findUserById = (id) => 
-    users['users_list'].find( (user) => user['id'] === id);
-
-const findUserByIdAndJob = (name, job) => {
-    users['users_list'].find ( 
-        (user) => {
-            if (user['name'] === name && user['job'] == job)
-                return user;
-        }
-    );
-}
-
-// Add user to our "Database"
-const addUser = (user) => {
-    users['users_list'].push(user);
-    return user;
-}
-
-// Delete user from our "Database"
-const deleteUserById = (id) => {
-    const index = users['users_list'].findIndex( (user, ind) => {
-        if (user.id === id){
-            return ind;
-        }
-    });
-    if (index === undefined){
-        return undefined;
-    } else {
-        return users['users_list'].splice(index, 1);
-    }
-}
-
 // Query Users
-app.get('/users', (req, res) => {
+app.get('/users', async (req, res) => {
     const name = req.query.name;
     const job = req.query.job;
 
-    // To use double query, do: http.../users?name=Mac&job=Professor
-    if (name != undefined && job != undefined){
-        let result = findUserByIdAndJob(name, job);
-        result = {users_list: result};
-        res.send(result);
-    } else if (name != undefined){
-        let result = findUserByName(name);
-        result = {users_list: result};
-        res.send(result);
-    } else {
-        res.send(users);
+    try{
+        const result = await userService.getUsers(name, job);
+        res.send({users_list:result})
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("An error ocurred in the server. ");
     }
 });
 
 // Get a user by ID
-app.get('/users/:id', (req, res) => {
+app.get('/users/:id', async (req, res) => {
     const id = req.params['id'];
-    let result = findUserById(id);
-    if (result === undefined) {
+    let result = await userService.findUserById(id);
+    if (result === undefined || result === null) {
         res.status(404).send('Resource not found.');
     } else {
-        res.send(result);
+        res.send({users_list:result});
     }
 })
 
 
 // Delete a user
-app.delete('/users/:id', (req, res) => {
+app.delete('/users/:id', async (req, res) => {
     const id = req.params['id'];
-    let result = deleteUserById(id);
+    let result = await userService.deleteUserById(id);
     if (result === undefined) {
         res.status(404).send('Resource not found.');
     } else {
@@ -100,16 +50,12 @@ app.get('/', (req, res) => {
 });
 
 // Posting (Creating) User
-app.post('/users', (req, res) => {
+app.post('/users', async (req, res) => {
     const userToAdd = req.body;
-    // Add ID
-    let rand = Math.round (10000 * Math.random());
-    userToAdd.id = rand;
-
-    addUser(userToAdd);
-    // Properly send status that user was created, along
-    // with user itself (now with id)
-    res.status(201).send(userToAdd);
+    // Add User to DB (controller)
+    const savedUser = await userService.addUser(userToAdd);
+    if (savedUser) res.status(201).send(savedUser);
+    else res.status(500).end();
 })
 
 app.listen(port, ()=>{

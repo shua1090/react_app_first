@@ -22,7 +22,7 @@ function MyApp() {
     function removeOneCharacter(index) {
         const characterToDelete = characters[index];
         
-        fetch(`http://localhost:8000/users/${characterToDelete.id}`, {method: "DELETE",})
+        fetch(`http://localhost:8000/users/${characterToDelete._id}`, {method: "DELETE",})
             .then((res) => {
                 // Succesful deletion
                 if (res.status === 204){
